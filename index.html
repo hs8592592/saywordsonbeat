@@ -114,6 +114,20 @@
         .signature-area { background: #F2FBF9; margin: 0 -22px -22px -22px; padding: 10px; text-align: center; border-bottom-left-radius: 32px; border-bottom-right-radius: 32px; border-top: 1px solid #CFE5E0; }
         .signature-text { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
         #badge { border-color: #7FC8C0; color: #4A7C74; }
+
+        /* 结算画面样式 */
+        #result-layer {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.85);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-align: center; backdrop-filter: blur(10px);
+        }
+        .congrats-card {
+            background: white; color: #1e293b; padding: 40px; border-radius: 40px;
+            box-shadow: 0 0 50px rgba(255,255,255,0.2);
+            transform: scale(0.8); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #result-layer.show .congrats-card { transform: scale(1); opacity: 1; }
     </style>
 </head>
 <body>
@@ -125,6 +139,15 @@
         <video id="v2" playsinline loop style="display:none;" preload="auto" muted>
             <source src="https://raw.githubusercontent.com/hs8592592/say-words-on-beat-/main/2-yasuo.mp4" type="video/mp4">
         </video>
+    </div>
+
+    <div id="result-layer">
+        <div class="congrats-card flex flex-col items-center gap-6">
+            <div class="text-7xl">🐼</div>
+            <h1 class="text-5xl font-bold text-teal-600">你真棒！</h1>
+            <p class="text-3xl font-medium text-slate-600">Good Job!</p>
+            <div class="mt-4 px-6 py-2 bg-teal-50 text-teal-700 rounded-full font-bold">练习完成！</div>
+        </div>
     </div>
 
     <div id="game-layer">
@@ -195,6 +218,10 @@
         const wordsArea = document.getElementById('words');
         const historyListEl = document.getElementById('history-list');
         const moreHistoryBtn = document.getElementById('more-history');
+        const resultLayer = document.getElementById('result-layer');
+
+        // 音效文件：欢呼声
+        const cheerAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
 
         let pages = []; 
         let isRunning = false;
@@ -297,13 +324,11 @@
             
             v1.style.display = 'block'; v2.style.display = 'none';
             v1.currentTime = 0;
-            v1.muted = false; // 确保播放音频
+            v1.muted = false; 
             
-            // 解决切换卡顿：播放视频1的同时预热视频2
             const playPromise = v1.play();
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
-                    console.log("需要用户交互才能播放音频");
                     v1.muted = true;
                     v1.play();
                 });
@@ -321,6 +346,20 @@
             v2.play();
             document.getElementById('game-layer').style.opacity = '1';
             startRhythm();
+        }
+
+        function showResult() {
+            isRunning = false;
+            cancelAnimationFrame(rAFId);
+            v2.pause();
+            cheerAudio.play(); // 播放欢呼声
+            resultLayer.style.display = 'flex';
+            setTimeout(() => resultLayer.classList.add('show'), 10);
+            
+            // 3秒后自动返回首页
+            setTimeout(() => {
+                location.reload();
+            }, 4000);
         }
 
         function startRhythm() {
@@ -344,7 +383,11 @@
                     const roundsPerPage = repeatPerPage * 2;
                     const pageIdx = Math.floor((effectiveRound - 1) / roundsPerPage);
                     
-                    if (pageIdx >= pages.length) { location.reload(); return; }
+                    // 检查是否所有词语都练完了
+                    if (pageIdx >= pages.length) { 
+                        showResult(); 
+                        return; 
+                    }
 
                     const currentPageData = pages[pageIdx];
                     const roundInPage = (effectiveRound - 1) % roundsPerPage;
@@ -387,6 +430,7 @@
             updateHistoryUI();
             v1.load();
             v2.load();
+            cheerAudio.load();
         };
     </script>
 </body>

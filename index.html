@@ -1,284 +1,612 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>智学启未来 · 思远见世界 | Smarter Learning, Bigger Thinking</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --ivory:#F7F4EF; --ivory-2:#F0EBE2; --ink:#1F2421; --ink-soft:#4A4F4A;
-    --orange:#E89556; --orange-d:#D67E3C; --orange-deep:#B8632A;
-    --line:#E2DACE; --gold:#C9A66B; --paper:#FFFFFF;
-    --shadow:rgba(40,33,24,.10);
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{font-family:"Noto Sans SC",system-ui,sans-serif;color:var(--ink);
-    background:var(--ivory);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Say Words on Beat-熊猫词语卡点练习</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/pinyin-pro"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700&display=swap');
 
-  /* ===== 顶部条:logo + slogan ===== */
-  .topbar{position:sticky;top:0;z-index:100;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
-    padding:16px 40px;background:rgba(247,244,239,.86);backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--line)}
-  .brand{display:flex;align-items:center;gap:14px;text-decoration:none}
-  .brand .logobox{display:block;line-height:0}
-  .brand .logobox img{width:58px;height:58px;object-fit:contain;display:block}
-  .brand .txt{display:flex;flex-direction:column;line-height:1.15}
-  .brand .zh{font-family:"Noto Serif SC",serif;font-weight:700;font-size:19px;color:var(--ink);letter-spacing:1px}
-  .brand .en{font-family:"Fraunces",serif;font-weight:600;font-size:11px;color:var(--orange-deep);letter-spacing:1.5px;text-transform:uppercase}
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #000;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
 
-  /* 导航 */
-  nav.menu{display:flex;align-items:center;gap:6px;justify-self:center}
-  nav.menu a{position:relative;text-decoration:none;color:var(--ink-soft);font-weight:500;font-size:15.5px;
-    padding:9px 18px;border-radius:11px;transition:.22s;letter-spacing:1px}
-  nav.menu a .sub{display:block;font-size:9.5px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:600;margin-top:1px}
-  nav.menu a:hover{color:var(--ink);background:var(--ivory-2)}
-  nav.menu a.primary{color:var(--orange-deep)}
-  
-  .signin{padding:10px 22px;border-radius:30px;background:var(--ink);color:#fff;
-    font-weight:600;font-size:14.5px;text-decoration:none;transition:.22s;letter-spacing:1px;border:1.5px solid var(--ink)}
-  .signin:hover{background:var(--orange);border-color:var(--orange);box-shadow:0 6px 16px rgba(232,149,86,.32)}
+        .video-wrapper {
+            position: fixed; inset: 0; z-index: 5;
+            display: flex; align-items: center; justify-content: center; background: #000;
+        }
 
-  /* ===== HERO ===== */
-  .hero{position:relative;max-width:1180px;margin:0 auto;padding:88px 40px 40px;text-align:center}
-  .hero .eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:"Fraunces",serif;
-    font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--orange-deep);font-weight:600;margin-bottom:26px}
-  .hero .eyebrow::before,.hero .eyebrow::after{content:'';width:30px;height:1.5px;background:var(--gold);display:inline-block}
-  .hero h1{font-family:"Noto Serif SC",serif;font-weight:900;line-height:1.12;
-    font-size:clamp(40px,7vw,82px);letter-spacing:2px;color:var(--ink)}
-  .hero h1 .accent{color:var(--orange-d);position:relative;white-space:nowrap}
-  .hero .ensub{font-family:"Fraunces",serif;font-weight:400;font-style:italic;
-    font-size:clamp(17px,2.6vw,27px);color:var(--ink-soft);margin-top:22px;letter-spacing:.5px}
-  .hero .lead{max-width:600px;margin:26px auto 0;font-size:16px;color:var(--ink-soft);line-height:1.8}
+        video { width: 100%; height: 100%; object-fit: contain; }
 
-  /* ===== 四板块 ===== */
-  .sectionlabel{max-width:1180px;margin:74px auto 0;padding:0 40px;display:flex;align-items:center;gap:18px}
-  .sectionlabel .ln{flex:1;height:1px;background:var(--line)}
-  .sectionlabel span{font-family:"Fraunces",serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-weight:600}
+        #game-layer {
+            position: fixed; inset: 0; z-index: 10;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            pointer-events: none; opacity: 0; transition: opacity 0.5s;
+        }
 
-  .modules{max-width:1180px;margin:28px auto 0;padding:0 40px 30px;
-    display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-  .mod{position:relative;display:flex;flex-direction:column;justify-content:flex-start;
-    min-height:300px;padding:24px 24px;border-radius:24px;text-decoration:none;overflow:hidden;
-    background:var(--paper);border:1px solid var(--line);transition:transform .32s cubic-bezier(.2,.7,.3,1),box-shadow .32s,border-color .32s}
-  .mod:hover{transform:translateY(-7px);box-shadow:0 22px 44px var(--shadow);border-color:var(--orange)}
-  .mod .idx{font-family:"Fraunces",serif;font-size:13px;letter-spacing:2px;color:var(--gold);font-weight:600}
-  .mod .ic{width:60px;height:60px;border-radius:17px;display:flex;align-items:center;justify-content:center;
-    font-size:30px;margin:14px auto;background:var(--ivory-2);transition:.32s}
-  .mod:hover .ic{background:var(--orange);transform:scale(1.06) rotate(-4deg)}
-  .mod .modtop{text-align:left}
-  .mod .mzh{font-family:"Noto Serif SC",serif;font-weight:700;font-size:26px;color:var(--ink);letter-spacing:2px;margin-top:8px}
-  .mod .men{font-family:"Fraunces",serif;font-size:12.5px;color:var(--orange-deep);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-top:2px}
-  .mod .modlogo{width:120px;height:120px;object-fit:contain;margin:14px auto;border-radius:18px;transition:.32s}
-  .mod:hover .modlogo{transform:scale(1.05)}
-  .mod .modbtm{margin-top:auto}
-  .mod .mdesc{font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.55}
-  .mod .go{margin-top:16px;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--ink);transition:.25s}
-  .mod:hover .go{color:var(--orange-deep);gap:11px}
-  .mod.soon{opacity:.92}
-  .mod.soon .tag{position:absolute;top:20px;right:20px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
-    color:var(--ink-soft);background:var(--ivory-2);padding:4px 11px;border-radius:20px;font-weight:600}
-  /* 主推板块(好读/好练)用橙色调点缀 */
-  .mod.feature{background:linear-gradient(160deg,#fff 60%,#FDF3EA)}
-  
+        /* ── Grid responsive ── */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: clamp(5px, 1.5vw, 15px);
+            width: 95vw;
+            max-width: 1000px;
+            height: auto;
+            max-height: 55vh;
+        }
 
-  /* ===== 底部 ===== */
-  footer{max-width:1180px;margin:30px auto 0;padding:34px 40px 48px;border-top:1px solid var(--line);
-    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
-  footer .fbrand{display:flex;align-items:center;gap:12px}
-  footer .fbrand .flogobox{display:block;line-height:0}
-  footer .fbrand .flogobox img{width:40px;height:40px;object-fit:contain;display:block}
-  footer .fbrand .fzh{font-family:"Noto Serif SC",serif;font-weight:700;font-size:15px}
-  footer .fbrand .fen{font-family:"Fraunces",serif;font-size:10.5px;color:var(--orange-deep);letter-spacing:1.5px;text-transform:uppercase}
-  footer .copy{font-size:12.5px;color:var(--ink-soft);letter-spacing:.5px}
+        .word-box {
+            background: rgba(255, 255, 255, 0.98);
+            border: 4px solid #fff;
+            border-radius: 24px;
+            display: flex; flex-direction: row; align-items: center; justify-content: center;
+            color: #1e293b;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            opacity: 0;
+            padding: clamp(4px, 1.2vw, 10px);
+            overflow: hidden;
+            min-height: clamp(55px, 10vw, 120px);
+            transform: scale(1);
+        }
 
-  /* ===== 登录弹窗 ===== */
-  .overlay{position:fixed;inset:0;z-index:1000;background:rgba(31,36,33,.5);backdrop-filter:blur(4px);
-    display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .25s}
-  .overlay.show{display:flex;opacity:1}
-  .auth{width:100%;max-width:400px;background:var(--paper);border-radius:26px;padding:38px 34px 32px;
-    box-shadow:0 30px 70px rgba(20,15,8,.4);transform:translateY(14px);transition:transform .3s;position:relative}
-  .overlay.show .auth{transform:translateY(0)}
-  .auth .close{position:absolute;top:18px;right:20px;cursor:pointer;font-size:22px;color:var(--ink-soft);background:none;border:none;line-height:1}
-  .auth .alogo{margin:0 auto 16px;display:block;width:56px;line-height:0}
-  .auth .alogo img{width:56px;height:56px;object-fit:contain;display:block}
-  .auth h2{font-family:"Noto Serif SC",serif;text-align:center;font-size:23px;font-weight:700;letter-spacing:1px}
-  .auth .asub{text-align:center;font-size:13.5px;color:var(--ink-soft);margin-top:6px;margin-bottom:24px}
-  .tabs{display:flex;background:var(--ivory-2);border-radius:14px;padding:4px;margin-bottom:22px}
-  .tabs button{flex:1;border:none;background:none;padding:10px;border-radius:11px;cursor:pointer;
-    font-weight:600;font-size:14.5px;color:var(--ink-soft);transition:.2s;font-family:inherit}
-  .tabs button.on{background:#fff;color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.06)}
-  .gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:11px;padding:13px;
-    border:1.5px solid var(--line);border-radius:13px;background:#fff;cursor:pointer;font-weight:600;
-    font-size:14.5px;color:var(--ink);transition:.2s;font-family:inherit}
-  .gbtn:hover{background:var(--ivory);border-color:var(--ink-soft)}
-  .gbtn svg{width:19px;height:19px}
-  .divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--ink-soft);font-size:12px}
-  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
-  .field{margin-bottom:14px}
-  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;letter-spacing:.5px}
-  .field input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:14.5px;
-    font-family:inherit;transition:.2s;background:var(--ivory)}
-  .field input:focus{outline:none;border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(232,149,86,.14)}
-  .submit{width:100%;padding:13px;border:none;border-radius:13px;background:var(--ink);color:#fff;
-    font-weight:600;font-size:15px;cursor:pointer;transition:.2s;font-family:inherit;letter-spacing:1px;margin-top:6px}
-  .submit:hover{background:var(--orange);box-shadow:0 8px 20px rgba(232,149,86,.32)}
-  .authnote{text-align:center;font-size:11.5px;color:var(--ink-soft);margin-top:16px;line-height:1.5}
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-active { animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .keep-visible { opacity: 1; transform: scale(1); }
 
-  @media (max-width:920px){
-    .modules{grid-template-columns:1fr 1fr}
-    nav.menu a .sub{display:none}
-    .topbar{padding:14px 20px}
-    .hero{padding:60px 22px 30px}
-    .sectionlabel,.modules,footer{padding-left:22px;padding-right:22px}
-  }
-  @media (max-width:560px){
-    nav.menu{display:none}
-    .modules{grid-template-columns:1fr}
-    .mod{min-height:200px}
-  }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-</style>
+        .highlight-border {
+            border-color: #4A7C74 !important;
+            box-shadow: 0 0 50px rgba(74, 124, 116, 0.8) !important;
+            z-index: 20;
+            transform: scale(1.02);
+        }
+
+        /* Inner wrapper: flex-wrap so long words wrap instead of overflow */
+        .word-box-inner {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .char-unit {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            line-height: 1;
+            margin: 0 clamp(1px, 0.4vw, 4px);
+            min-width: 0;
+            flex-shrink: 1;
+        }
+
+        .pinyin-text {
+            font-size: clamp(0.5rem, 1.8vw, 2.2rem);
+            margin-bottom: 0.1em;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-weight: 500;
+            color: #4A7C74;
+            white-space: nowrap;
+        }
+
+        .kanji-text {
+            font-size: clamp(1rem, 4vw, 3.5rem);
+            font-weight: 700;
+            color: #2B2B2B;
+            transition: font-size 0.2s;
+            white-space: nowrap;
+        }
+
+        /* Scale down fonts for longer words */
+        .word-box[data-len="5"] .kanji-text,
+        .word-box[data-len="6"] .kanji-text  { font-size: clamp(0.75rem, 2.8vw, 2.5rem); }
+        .word-box[data-len="5"] .pinyin-text,
+        .word-box[data-len="6"] .pinyin-text  { font-size: clamp(0.4rem, 1.3vw, 1.5rem); }
+        .word-box[data-len="7"] .kanji-text,
+        .word-box[data-len="8"] .kanji-text   { font-size: clamp(0.6rem, 2.2vw, 2rem); }
+        .word-box[data-len="7"] .pinyin-text,
+        .word-box[data-len="8"] .pinyin-text  { font-size: clamp(0.32rem, 1vw, 1.2rem); }
+        .word-box[data-long] .kanji-text       { font-size: clamp(0.5rem, 1.8vw, 1.6rem); }
+        .word-box[data-long] .pinyin-text      { font-size: clamp(0.28rem, 0.8vw, 1rem); }
+
+        .no-pinyin .kanji-text { font-size: clamp(1.4rem, 5.5vw, 4.8rem); }
+        .no-pinyin .pinyin-text { display: none; }
+        .no-pinyin .word-box[data-len="5"] .kanji-text,
+        .no-pinyin .word-box[data-len="6"] .kanji-text { font-size: clamp(1rem, 3.5vw, 3.5rem); }
+        .no-pinyin .word-box[data-len="7"] .kanji-text,
+        .no-pinyin .word-box[data-len="8"] .kanji-text { font-size: clamp(0.8rem, 2.8vw, 2.8rem); }
+        .no-pinyin .word-box[data-long] .kanji-text    { font-size: clamp(0.65rem, 2.2vw, 2.2rem); }
+
+        /* ── Language toggle ── */
+        #lang-toggle {
+            position: fixed; top: 12px; right: 12px; z-index: 300;
+            background: #4A7C74; color: white;
+            border: none; border-radius: 20px;
+            padding: 6px 16px; font-size: 0.85rem; font-weight: bold;
+            cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        #lang-toggle:hover { background: #3a6560; }
+
+        /* ── UI Panel responsive ── */
+        #ui-panel {
+            position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+            z-index: 100; background: #EAF7F4; padding: clamp(12px, 3vw, 22px);
+            border-radius: 32px; border: 2px solid #CFE5E0;
+            width: 96%; max-width: 600px;
+            display: flex; flex-direction: column; gap: clamp(8px, 2vw, 14px);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            max-height: 90vh; overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 4px; }
+        .label-text {
+            font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+            color: #2B2B2B; font-weight: bold;
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        .opt-btn {
+            background: #FFFFFF; color: #333;
+            padding: clamp(6px, 1.5vw, 10px) 5px;
+            border-radius: 14px; cursor: pointer; flex: 1; text-align: center;
+            transition: all 0.2s; border: 2px solid #DADADA;
+            display: flex; flex-direction: column; line-height: 1.2;
+            position: relative; overflow: hidden;
+            font-size: clamp(0.68rem, 2vw, 0.9rem);
+        }
+        .opt-btn:hover { background: #F2FBF9; }
+        .opt-btn.active { background: #D4F1EC; border-color: #7FC8C0; color: #2B2B2B; transform: translateY(-1px); }
+        .opt-btn.active::after { content: ''; position: absolute; top: 6px; right: 6px; width: 4px; height: 4px; background-color: #E53935; border-radius: 50%; }
+
+        .btn-start {
+            background: #4A7C74; color: white;
+            padding: clamp(10px, 2.5vw, 14px);
+            border-radius: 18px; font-size: clamp(0.88rem, 2.8vw, 1.1rem); font-weight: bold;
+            cursor: pointer; text-align: center; margin-top: 5px;
+            box-shadow: 0 10px 20px -5px rgba(74, 124, 116, 0.3);
+            transition: opacity 0.2s;
+        }
+        .btn-start:hover { opacity: 0.9; }
+
+        #stop-btn { background: #CFE5E0; color: #4A7C74; padding: 10px; border-radius: 18px; cursor: pointer; text-align: center; display: none; font-weight: bold; }
+
+        textarea, select {
+            background: #FFFFFF; border: 2px solid #CFE5E0;
+            padding: clamp(6px, 1.5vw, 10px); border-radius: 14px; color: #2B2B2B;
+            outline: none; transition: border-color 0.2s;
+            font-size: clamp(0.78rem, 2.3vw, 1rem);
+            width: 100%; box-sizing: border-box;
+        }
+
+        .history-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .history-item {
+            background: white; border: 1px solid #CFE5E0; padding: 4px 10px; border-radius: 10px;
+            font-size: 12px; color: #4A7C74; cursor: pointer; max-width: 150px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: all 0.2s;
+        }
+        .history-item:hover { background: #D4F1EC; border-color: #7FC8C0; }
+        .more-toggle { font-size: 12px; color: #94a3b8; cursor: pointer; padding: 4px; text-decoration: underline; }
+
+        .signature-area {
+            background: #F2FBF9;
+            margin: 0 -22px -22px -22px;
+            padding: 10px; text-align: center;
+            border-bottom-left-radius: 32px; border-bottom-right-radius: 32px;
+            border-top: 1px solid #CFE5E0;
+        }
+        .signature-text { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
+        #badge { border-color: #7FC8C0; color: #4A7C74; font-size: clamp(0.85rem, 3vw, 1.25rem); }
+
+        /* ── Result layer ── */
+        #result-layer {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.85);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-align: center; backdrop-filter: blur(10px);
+        }
+        .congrats-card {
+            background: white; color: #1e293b;
+            padding: clamp(20px, 5vw, 40px); border-radius: 40px;
+            box-shadow: 0 0 50px rgba(255,255,255,0.2);
+            transform: scale(0.8); opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 90vw;
+        }
+        #result-layer.show .congrats-card { transform: scale(1); opacity: 1; }
+
+        @media (max-width: 480px) {
+            .grid-container { gap: 5px; }
+            .word-box { border-radius: 12px; border-width: 2px; }
+            #badge { top: 6px !important; padding: 5px 14px !important; }
+            .signature-area { margin: 0 -12px -12px -12px; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- 顶部条 -->
-<header class="topbar">
-  <a class="brand" href="home.html">
-    <span class="logobox"><img src="hlogo.png" alt="haoteach logo"></span>
-  </a>
-  <nav class="menu">
-    <a href="https://read.haoteach.com/" target="_blank" rel="noopener">好读<span class="sub">Read</span></a>
-    <a class="primary" href="lianxi.html">好练<span class="sub">Practice</span></a>
-    <a href="#" onclick="return false;">好唱<span class="sub">Sing</span></a>
-    <a href="#" onclick="return false;">好说<span class="sub">Speak</span></a>
-  </nav>
-  <div style="justify-self:end"><a class="signin" href="#" onclick="openAuth('signin');return false;">登录 / 注册</a></div>
-</header>
+    <!-- Language toggle -->
+    <button id="lang-toggle" onclick="toggleLang()">EN</button>
 
-<!-- HERO -->
-<section class="hero">
-  <h1>智学启未来<br><span class="accent">思远见世界</span></h1>
-  <p class="ensub">Smarter Learning, Bigger Thinking</p>
-</section>
+    <div class="video-wrapper">
+        <video id="v1" playsinline preload="auto" muted>
+            <source src="https://raw.githubusercontent.com/hs8592592/say-words-on-beat-/main/1-yasuo.mp4" type="video/mp4">
+        </video>
+        <video id="v2" playsinline loop style="display:none;" preload="auto" muted>
+            <source src="https://raw.githubusercontent.com/hs8592592/say-words-on-beat-/main/2-yasuo.mp4" type="video/mp4">
+        </video>
+    </div>
 
-<!-- 四板块 -->
-<div class="sectionlabel"><span>Four Paths</span><div class="ln"></div></div>
-<main class="modules">
-  <a class="mod feature" href="https://read.haoteach.com/" target="_blank" rel="noopener">
-    <div class="modtop">
-      <span class="idx">01</span>
-      <div class="mzh">好读</div>
-      <div class="men">Read</div>
+    <div id="result-layer">
+        <div class="congrats-card flex flex-col items-center gap-6">
+            <div class="text-7xl">🐼</div>
+            <h1 id="result-title" class="text-5xl font-bold text-teal-600">你真棒！</h1>
+            <p id="result-sub" class="text-3xl font-medium text-slate-600">Good Job!</p>
+            <div id="result-tag" onclick="location.reload()" style="cursor:pointer;" class="mt-4 px-6 py-2 bg-teal-50 text-teal-700 rounded-full font-bold hover:bg-teal-100 transition-colors">练习完成！</div>
+        </div>
     </div>
-    <img class="modlogo" src="panda_read.jpg" alt="熊猫卡点读词">
-    <div class="modbtm">
-      <div class="mdesc">熊猫卡点读词,在节奏里认字识词。</div>
-      <span class="go">进入 <span>→</span></span>
-    </div>
-  </a>
 
-  <a class="mod feature" href="lianxi.html">
-    <div class="modtop">
-      <span class="idx">02</span>
-      <div class="mzh">好练</div>
-      <div class="men">Practice</div>
+    <div id="game-layer">
+        <div id="badge" class="absolute top-10 bg-white/95 px-8 py-3 rounded-full text-xl shadow-xl border-2 font-bold">READY?</div>
+        <div class="grid-container" id="grid"></div>
     </div>
-    <img class="modlogo" src="fenceng_logo.png" alt="分层练习">
-    <div class="modbtm">
-      <div class="mdesc">《跨越丝路》分层练习,对标 CCG 与 HSK 3.0。</div>
-      <span class="go">进入 <span>→</span></span>
-    </div>
-  </a>
 
-  <a class="mod soon" href="#" onclick="return false;">
-    <span class="tag">即将上线</span>
-    <div class="modtop">
-      <span class="idx">03</span>
-      <div class="mzh">好唱</div>
-      <div class="men">Sing</div>
-    </div>
-    <div class="ic">🎵</div>
-    <div class="modbtm">
-      <div class="mdesc">在歌声里记住语调与韵律。</div>
-      <span class="go">敬请期待 <span>→</span></span>
-    </div>
-  </a>
+    <div id="ui-panel">
+        <div id="setup-controls" class="flex flex-col gap-4">
+            <div class="flex gap-4">
+                <div class="control-group flex-1">
+                    <span id="lbl-mode" class="label-text">模式 Mode</span>
+                    <div class="flex gap-2">
+                        <div class="opt-btn mode-sel active" data-type="fixed" data-cn="固定" data-en="Fixed">固定</div>
+                        <div class="opt-btn mode-sel" data-type="random" data-cn="随机" data-en="Random">随机</div>
+                        <div class="opt-btn mode-sel" data-type="custom" data-cn="自定义" data-en="Custom">自定义</div>
+                    </div>
+                </div>
+                <div class="control-group w-1/4">
+                    <span id="lbl-pinyin" class="label-text">拼音 Pinyin</span>
+                    <div id="pinyin-toggle" class="opt-btn active">开启</div>
+                </div>
+            </div>
 
-  <a class="mod soon" href="#" onclick="return false;">
-    <span class="tag">即将上线</span>
-    <div class="modtop">
-      <span class="idx">04</span>
-      <div class="mzh">好说</div>
-      <div class="men">Speak</div>
-    </div>
-    <div class="ic">💬</div>
-    <div class="modbtm">
-      <div class="mdesc">开口表达,把所学用于真实对话。</div>
-      <span class="go">敬请期待 <span>→</span></span>
-    </div>
-  </a>
-</main>
+            <div class="control-group">
+                <span id="lbl-words" class="label-text">输入词语 Word List</span>
+                <textarea id="words" rows="2" placeholder="苹果, 熊猫, 老师"></textarea>
+                <div id="history-container">
+                    <div class="history-wrap" id="history-list"></div>
+                    <div id="more-history" class="more-toggle" style="display:none;">显示更多历史记录...</div>
+                </div>
+            </div>
 
-<!-- 底部 -->
-<footer>
-  <div class="fbrand">
-    <span class="flogobox"><img src="hlogo.png" alt="logo"></span>
-  </div>
-  <div class="copy">© 2026 haoteach.com</div>
-</footer>
+            <div class="flex gap-3 items-end">
+                <div class="control-group w-1/4">
+                    <span id="lbl-repeat" class="label-text">每页重复次数</span>
+                    <select id="repeat-count">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div class="control-group flex-1">
+                    <span id="lbl-speed" class="label-text">速度控制 Speed Control</span>
+                    <div class="flex gap-1">
+                        <div class="opt-btn speed-btn active" data-mode="1" data-cn="慢" data-en="Slow">慢</div>
+                        <div class="opt-btn speed-btn" data-mode="2" data-cn="中" data-en="Med">中</div>
+                        <div class="opt-btn speed-btn" data-mode="3" data-cn="快" data-en="Fast">快</div>
+                    </div>
+                </div>
+            </div>
 
-<!-- 登录/注册弹窗 -->
-<div class="overlay" id="authOverlay">
-  <div class="auth">
-    <button class="close" onclick="closeAuth()">×</button>
-    <span class="alogo"><img src="hlogo.png" alt="logo"></span>
-    <h2 id="authTitle">欢迎回来</h2>
-    <p class="asub" id="authSub">登录以继续你的学习</p>
-    <div class="tabs">
-      <button id="tabIn" class="on" onclick="switchTab('signin')">登录 Sign in</button>
-      <button id="tabUp" onclick="switchTab('signup')">注册 Sign up</button>
+            <div id="start-btn" class="btn-start">开始训练 START TRAINING</div>
+            <div class="signature-area"><span class="signature-text">Designed by Sun Hao</span></div>
+        </div>
+        <div id="stop-btn">停止训练 STOP TRAINING</div>
     </div>
-    <button class="gbtn" onclick="alert('Google 登录功能即将开放。')">
-      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
-      使用 Google 继续
-    </button>
-    <div class="divider">或</div>
-    <div id="nameField" class="field" style="display:none">
-      <label>昵称 Name</label>
-      <input type="text" placeholder="你的昵称">
-    </div>
-    <div class="field">
-      <label>邮箱 Email</label>
-      <input type="email" placeholder="you@example.com">
-    </div>
-    <div class="field">
-      <label>密码 Password</label>
-      <input type="password" placeholder="••••••••">
-    </div>
-    <button class="submit" id="authSubmit" onclick="alert('登录/注册功能即将开放,目前为界面预览。')">登录</button>
-    <p class="authnote">继续即表示同意我们的服务条款与隐私政策。</p>
-  </div>
-</div>
 
-<script>
-  const ov=document.getElementById('authOverlay');
-  function openAuth(mode){ov.classList.add('show');switchTab(mode||'signin');document.body.style.overflow='hidden';}
-  function closeAuth(){ov.classList.remove('show');document.body.style.overflow='';}
-  ov.addEventListener('click',e=>{if(e.target===ov)closeAuth();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuth();});
-  function switchTab(mode){
-    const isUp=mode==='signup';
-    document.getElementById('tabIn').classList.toggle('on',!isUp);
-    document.getElementById('tabUp').classList.toggle('on',isUp);
-    document.getElementById('nameField').style.display=isUp?'block':'none';
-    document.getElementById('authTitle').textContent=isUp?'创建账号':'欢迎回来';
-    document.getElementById('authSub').textContent=isUp?'注册以开始你的学习之旅':'登录以继续你的学习';
-    document.getElementById('authSubmit').textContent=isUp?'注册':'登录';
-  }
-</script>
+    <script>
+        const { pinyin } = pinyinPro;
+        const v1 = document.getElementById('v1');
+        const v2 = document.getElementById('v2');
+        const grid = document.getElementById('grid');
+        const badge = document.getElementById('badge');
+        const wordsArea = document.getElementById('words');
+        const historyListEl = document.getElementById('history-list');
+        const moreHistoryBtn = document.getElementById('more-history');
+        const resultLayer = document.getElementById('result-layer');
+        const cheerAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+
+        let pages = [];
+        let isRunning = false;
+        let selectedSpeed = 1;
+        let currentMode = 'fixed';
+        let showPinyin = true;
+        let rAFId = null;
+        let currentLang = 'cn';
+
+        const CONFIG = {
+            1: { speed: 0.5, interval: 5.352 },
+            2: { speed: 0.7, interval: 3.824 },
+            3: { speed: 1.0, interval: 2.676 }
+        };
+
+        // ── Language i18n map ──
+        const i18n = {
+            cn: {
+                langBtn: 'EN',
+                lblMode: '模式 Mode', lblPinyin: '拼音 Pinyin',
+                lblWords: '输入词语 Word List', lblRepeat: '每页重复次数',
+                lblSpeed: '速度控制 Speed Control',
+                pinyinOn: '开启', pinyinOff: '关闭',
+                startBtn: '开始训练 START TRAINING', stopBtn: '停止训练 STOP TRAINING',
+                moreHistory: '显示更多历史记录...',
+                placeholder: '苹果, 熊猫, 老师',
+                resultTitle: '你真棒！', resultSub: 'Good Job!', resultTag: '练习完成！'
+            },
+            en: {
+                langBtn: '中',
+                lblMode: 'Mode', lblPinyin: 'Pinyin',
+                lblWords: 'Word List', lblRepeat: 'Repeats / Page',
+                lblSpeed: 'Speed Control',
+                pinyinOn: 'ON', pinyinOff: 'OFF',
+                startBtn: 'START TRAINING', stopBtn: 'STOP TRAINING',
+                moreHistory: 'Show more history...',
+                placeholder: 'apple, panda, teacher',
+                resultTitle: 'Well Done!', resultSub: 'Good Job!', resultTag: 'Practice Complete!'
+            }
+        };
+
+        function applyLang() {
+            const t = i18n[currentLang];
+            document.getElementById('lang-toggle').textContent = t.langBtn;
+            document.getElementById('lbl-mode').textContent = t.lblMode;
+            document.getElementById('lbl-pinyin').textContent = t.lblPinyin;
+            document.getElementById('lbl-words').textContent = t.lblWords;
+            document.getElementById('lbl-repeat').textContent = t.lblRepeat;
+            document.getElementById('lbl-speed').textContent = t.lblSpeed;
+            document.getElementById('pinyin-toggle').textContent = showPinyin ? t.pinyinOn : t.pinyinOff;
+            document.getElementById('start-btn').textContent = t.startBtn;
+            document.getElementById('stop-btn').textContent = t.stopBtn;
+            moreHistoryBtn.textContent = t.moreHistory;
+            wordsArea.placeholder = t.placeholder;
+            document.getElementById('result-title').textContent = t.resultTitle;
+            document.getElementById('result-sub').textContent = t.resultSub;
+            document.getElementById('result-tag').textContent = t.resultTag;
+
+            document.querySelectorAll('.mode-sel').forEach(btn => {
+                btn.textContent = btn.dataset[currentLang];
+            });
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.textContent = btn.dataset[currentLang];
+            });
+        }
+
+        function toggleLang() {
+            currentLang = currentLang === 'cn' ? 'en' : 'cn';
+            applyLang();
+        }
+
+        // ── History ──
+        let historyData = JSON.parse(localStorage.getItem('panda_history') || '[]');
+
+        function updateHistoryUI(expanded = false) {
+            historyListEl.innerHTML = '';
+            const toShow = expanded ? historyData : historyData.slice(0, 3);
+            toShow.forEach(text => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerText = text;
+                item.onclick = () => { wordsArea.value = text; };
+                historyListEl.appendChild(item);
+            });
+            moreHistoryBtn.style.display = (historyData.length > 3 && !expanded) ? 'block' : 'none';
+        }
+
+        function saveHistory(text) {
+            if (!text) return;
+            historyData = historyData.filter(i => i !== text);
+            historyData.unshift(text);
+            if (historyData.length > 10) historyData.pop();
+            localStorage.setItem('panda_history', JSON.stringify(historyData));
+            updateHistoryUI();
+        }
+
+        moreHistoryBtn.onclick = () => updateHistoryUI(true);
+
+        document.getElementById('pinyin-toggle').onclick = function() {
+            showPinyin = !showPinyin;
+            this.classList.toggle('active');
+            this.textContent = showPinyin ? i18n[currentLang].pinyinOn : i18n[currentLang].pinyinOff;
+            grid.classList.toggle('no-pinyin', !showPinyin);
+        };
+
+        document.querySelectorAll('.mode-sel').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.mode-sel').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.type;
+            };
+        });
+
+        document.querySelectorAll('.speed-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedSpeed = parseInt(btn.dataset.mode);
+            };
+        });
+
+        function createGrid() {
+            grid.innerHTML = '';
+            for(let i = 0; i < 8; i++) {
+                const div = document.createElement('div');
+                div.className = 'word-box';
+                div.id = `box-${i}`;
+                grid.appendChild(div);
+            }
+        }
+
+        // ── Render a word into a box with long-word overflow fix ──
+        function renderWord(box, word) {
+            if (box.dataset.word === word) return;
+
+            const py = pinyin(word, { type: 'array' });
+            const len = word.length;
+
+            // Clear size attributes
+            box.removeAttribute('data-len');
+            box.removeAttribute('data-long');
+
+            if (len >= 9) {
+                box.setAttribute('data-long', '');
+            } else if (len >= 5) {
+                box.setAttribute('data-len', String(len));
+            }
+
+            const inner = document.createElement('div');
+            inner.className = 'word-box-inner';
+            inner.innerHTML = word.split('').map((c, idx) =>
+                `<div class="char-unit">
+                    <div class="pinyin-text">${py[idx] || ''}</div>
+                    <div class="kanji-text">${c}</div>
+                </div>`
+            ).join('');
+            box.innerHTML = '';
+            box.appendChild(inner);
+            box.dataset.word = word;
+        }
+
+        // ── Start session ──
+        async function startSession() {
+            const raw = wordsArea.value.trim();
+            if (!raw) return;
+
+            saveHistory(raw);
+            const inputList = raw.split(/[,，;；]/).map(s => s.trim()).filter(s => s);
+            pages = [];
+
+            if (currentMode === 'fixed') {
+                inputList.forEach(word => { pages.push(Array(8).fill(word)); });
+            } else if (currentMode === 'random') {
+                for (let i = 0; i < Math.max(inputList.length, 5); i++) {
+                    let pageWords = [];
+                    for (let j = 0; j < 8; j++) pageWords.push(inputList[Math.floor(Math.random() * inputList.length)]);
+                    pages.push(pageWords);
+                }
+            } else if (currentMode === 'custom') {
+                let pageWords = [];
+                for (let j = 0; j < 8; j++) pageWords.push(inputList[j % inputList.length]);
+                pages.push(pageWords);
+            }
+
+            isRunning = true;
+            document.getElementById('setup-controls').style.display = 'none';
+            document.getElementById('stop-btn').style.display = 'block';
+            createGrid();
+
+            v1.style.display = 'block'; v2.style.display = 'none';
+            v1.currentTime = 0;
+            v1.muted = false;
+
+            const playPromise = v1.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => { v1.muted = true; v1.play(); });
+            }
+            v2.load();
+            v1.onended = () => { if (isRunning) enterLoopMode(); };
+        }
+
+        function enterLoopMode() {
+            v1.style.display = 'none';
+            v2.style.display = 'block';
+            v2.muted = false;
+            v2.playbackRate = CONFIG[selectedSpeed].speed;
+            v2.play();
+            document.getElementById('game-layer').style.opacity = '1';
+            startRhythm();
+        }
+
+        function showResult() {
+            isRunning = false;
+            cancelAnimationFrame(rAFId);
+            v2.pause();
+            cheerAudio.play();
+            resultLayer.style.display = 'flex';
+            setTimeout(() => resultLayer.classList.add('show'), 10);
+
+        }
+
+        function startRhythm() {
+            let startTime = performance.now();
+            const interval = CONFIG[selectedSpeed].interval * 1000;
+            const repeatPerPage = parseInt(document.getElementById('repeat-count').value);
+
+            function run() {
+                if (!isRunning) return;
+                const now = performance.now();
+                const elapsedSinceStart = now - startTime;
+                const actionRound = Math.floor(elapsedSinceStart / interval) + 1;
+                const roundElapsed = elapsedSinceStart % interval;
+                const activeIndex = Math.floor(roundElapsed / (interval / 8));
+
+                if (actionRound === 1) {
+                    badge.innerText = "READY?";
+                    document.querySelectorAll('.word-box').forEach(box => {
+                        box.style.opacity = "0"; box.className = 'word-box';
+                    });
+                } else {
+                    const effectiveRound = actionRound - 1;
+                    const roundsPerPage = repeatPerPage * 2;
+                    const pageIdx = Math.floor((effectiveRound - 1) / roundsPerPage);
+
+                    if (pageIdx >= pages.length) { showResult(); return; }
+
+                    const currentPageData = pages[pageIdx];
+                    const roundInPage = (effectiveRound - 1) % roundsPerPage;
+                    const cycleType = roundInPage % 2;
+
+                    document.querySelectorAll('.word-box').forEach((box, i) => {
+                        renderWord(box, currentPageData[i]);
+
+                        if (cycleType === 0) {
+                            if (i < activeIndex) { box.className = 'word-box keep-visible'; box.style.opacity = "1"; }
+                            else if (i === activeIndex) { box.className = 'word-box pop-active'; box.style.opacity = "1"; }
+                            else { box.style.opacity = "0"; box.className = 'word-box'; }
+                        } else {
+                            box.style.opacity = "1";
+                            box.className = i === activeIndex ? 'word-box keep-visible highlight-border' : 'word-box keep-visible';
+                        }
+                    });
+                    badge.innerText = currentMode === 'fixed' ? currentPageData[0] : "TRAINING...";
+                }
+                rAFId = requestAnimationFrame(run);
+            }
+            rAFId = requestAnimationFrame(run);
+        }
+
+        document.getElementById('start-btn').onclick = startSession;
+        document.getElementById('stop-btn').onclick = () => location.reload();
+
+        window.onload = () => {
+            createGrid();
+            updateHistoryUI();
+            applyLang();
+            v1.load();
+            v2.load();
+            cheerAudio.load();
+        };
+    </script>
 </body>
 </html>
